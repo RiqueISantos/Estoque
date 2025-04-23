@@ -22,6 +22,19 @@ class Fornecedor(Base):
         session.commit()
         print(f'o fornecedor {nome} foi adicionado')
     
+class Categoria(Base):
+    __tablename__ = 'categorias'
+
+    id = Column(Integer, primary_key = True, autoincrement = True)
+    nome = Column(String)
+
+    @staticmethod
+    def adicionar_categoria(nome):
+        categoria = Categoria(nome = nome)
+        session.add(categoria)
+        session.commit()
+        print(f'categoria {nome} foi adicionada')
+
 
 class Produto(Base):
     __tablename__ = 'produtos'
@@ -33,12 +46,13 @@ class Produto(Base):
     lote = Column(String)
     data_entrada = Column(Date, default=datetime.date.today)
     fornecedor_id = Column(Integer, ForeignKey('fornecedores.id'))
+    categoria_id = Column(Integer, ForeignKey('categorias.id'))
 
     @staticmethod
-    def adicionar_produto(nome, codigo, qtd, lote, fornecedor_id,data_entrada=None):
+    def adicionar_produto(nome, codigo, qtd, lote, fornecedor_id,categoria_id,data_entrada=None):
         if data_entrada is None:
             data_entrada = datetime.date.today()
-        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote, data_entrada=data_entrada, fornecedor_id = fornecedor_id)
+        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote, data_entrada=data_entrada, fornecedor_id = fornecedor_id,categoria_id = categoria_id)
         session.add(produto)
         session.commit()
         print(f"Produto {nome} adicionado com sucesso!")
