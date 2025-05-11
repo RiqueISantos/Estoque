@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 class DeclarativeABCMeta(DeclarativeMeta, ABCMeta):
     pass
 
+
 # Base unificada para todas as classes
 Base = declarative_base(metaclass=DeclarativeABCMeta)
 
@@ -137,15 +138,19 @@ class Produto(Item):
         session.commit()
         print(f"Produto {nome} adicionado com sucesso!")
         
-    # Método de instância
-    def remover(self, session):
-        session.delete(self)
-        session.commit()
-        print(f"Produto {self.nome} removido com sucesso!")
-
     @staticmethod
-    def listar_estoque():
-        produtos = session.query(Produto).all()
+    def remover(id):
+        produto = session.query(Produto).filter_by(id=id).first()
+        if not produto:
+            print('Produto não foi cadastrado no sistema')
+            return
+        session.delete(produto)
+        session.commit()
+        print(f"Produto {produto.nome} removido com sucesso!")
+
+    @classmethod
+    def listar_estoque(cls):
+        produtos = session.query(cls).all()
         if not produtos:
             print("O estoque está vazio.")
             return

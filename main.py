@@ -17,3 +17,7 @@ estoque.Marca.produto_marca('sangsung')
 
 estoque.Fornecedor.produto_fornecedor(1)
 estoque.Categoria.marca_categoria('TEC')
+
+estoque.Produto.remover(2)
+
+estoque.Produto.listar_estoque()
