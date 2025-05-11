@@ -1,23 +1,29 @@
 import datetime
-
 from sqlalchemy import create_engine, Column, String, Integer, Date, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from abc import ABCMeta, abstractmethod
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
+# Definir a metaclasse combinada para suporte a classes abstratas
+class DeclarativeABCMeta(DeclarativeMeta, ABCMeta):
+    pass
+
+# Base unificada para todas as classes
+Base = declarative_base(metaclass=DeclarativeABCMeta)
 
 # Configuração do banco
 db = create_engine('sqlite:///estoque.db')
 Session = sessionmaker(bind=db)
 session = Session()
-Base = declarative_base()
 
-# -------------------------------
+# ------------------------------------------
 class Fornecedor(Base):
     __tablename__ = 'fornecedores'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String, unique=True)
     contato = Column(String)
-
-    produtos = relationship('Produto', backref='fornecedor')  # corrigido: backref singular
+    produtos = relationship('Produto', back_populates='fornecedor')
 
     @staticmethod
     def adicionar(nome, contato):
@@ -37,14 +43,14 @@ class Fornecedor(Base):
             print(f'{produto.nome} - lote: {produto.lote}')
 
 
-# -------------------------------
+# ------------------------------------------
 class Categoria(Base):
     __tablename__ = 'categorias'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String)
 
-    marcas = relationship('Marca', backref='categoria')  # Corrigido: nome correto e backref ajustado
+    marcas = relationship('Marca', backref='categoria')
 
     @staticmethod
     def adicionar(nome):
@@ -64,7 +70,7 @@ class Categoria(Base):
             print(marca.nome)
 
 
-# -------------------------------
+# ------------------------------------------
 class Marca(Base):
     __tablename__ = 'marca'
 
@@ -72,7 +78,7 @@ class Marca(Base):
     nome = Column(String)
     id_categoria = Column(Integer, ForeignKey('categorias.id'))
 
-    produtos = relationship('Produto', backref='marca')
+    produtos = relationship('Produto', back_populates='marca')
 
     @staticmethod
     def adicionar(nome, id_categoria):
@@ -92,12 +98,27 @@ class Marca(Base):
             print(f'{produto.nome} - {produto.codigo}')
 
 
-# -------------------------------
-class Produto(Base):
+# ------------------------------------------
+class Item(Base):
+    __abstract__ = True  # Não será mapeada
+
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(100), nullable=False)
+    data_cadastro = Column(Date, default=datetime.date.today)
+
+    @abstractmethod
+    def adicionar(self, session):
+        pass
+
+    @abstractmethod
+    def remover(self, session):
+        pass
+
+
+# ------------------------------------------
+class Produto(Item):
     __tablename__ = 'produtos'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    nome = Column(String)
     codigo = Column(String, unique=True)
     qtd = Column(Integer)
     lote = Column(String)
@@ -105,32 +126,22 @@ class Produto(Base):
     fornecedor_id = Column(Integer, ForeignKey('fornecedores.id'))
     marca_id = Column(Integer, ForeignKey('marca.id'))
 
+    fornecedor = relationship('Fornecedor', back_populates='produtos')
+    marca = relationship('Marca', back_populates='produtos')
+
     @staticmethod
-    def adicionar(nome, codigo, qtd, lote, fornecedor_id, marca_id, data_entrada=None):
-        if data_entrada is None:
-            data_entrada = datetime.date.today()
-        produto = Produto(
-            nome=nome,
-            codigo=codigo,
-            qtd=qtd,
-            lote=lote,
-            data_entrada=data_entrada,
-            fornecedor_id=fornecedor_id,
-            marca_id=marca_id
-        )
+    def adicionar(nome, codigo, qtd, lote, fornecedor_id, marca_id):
+        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote, 
+                        fornecedor_id=fornecedor_id, marca_id=marca_id)
         session.add(produto)
         session.commit()
         print(f"Produto {nome} adicionado com sucesso!")
-
-    @staticmethod
-    def remover(codigo):
-        produto = session.query(Produto).filter_by(codigo=codigo).first()
-        if not produto:
-            print(f'O produto {codigo} não foi cadastrado no sistema')
-            return
-        session.delete(produto)
+        
+    # Método de instância
+    def remover(self, session):
+        session.delete(self)
         session.commit()
-        print(f'O produto {produto.nome} com código {codigo} foi removido corretamente')
+        print(f"Produto {self.nome} removido com sucesso!")
 
     @staticmethod
     def listar_estoque():
@@ -160,6 +171,6 @@ class Produto(Base):
             print(f"Nenhum produto com o código {codigo} foi encontrado.")
 
 
-# -------------------------------
+# ------------------------------------------
 # Criar as tabelas no banco
 Base.metadata.create_all(bind=db)

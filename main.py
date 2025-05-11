@@ -6,8 +6,7 @@ estoque.Categoria.adicionar('TEC')
 estoque.Marca.adicionar('dell', 1)
 estoque.Marca.adicionar('samsung', 1)
 estoque.Fornecedor.adicionar('Gilson', '116532456')
-
-estoque.Produto.adicionar('teclado', '123', 25, 'h098',1, 1)
+estoque.Produto.adicionar('teclado','123','25','h098',1,1)
 
 estoque.Produto.listar_estoque()
 
