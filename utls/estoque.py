@@ -18,6 +18,33 @@ Session = sessionmaker(bind=db)
 session = Session()
 
 # ------------------------------------------
+class Estoque:
+
+    @classmethod
+    def mostrar_fornecedores(cls):
+        fornecedores = session.query(Fornecedor).all()
+        if not fornecedores:
+            print('Não há fornecedores cadastrados')
+            return
+        for f in fornecedores:
+            print(f'{f.id} - {f.nome} - {f.contato}')
+
+    @classmethod
+    def listar_estoque(cls):
+        produtos = session.query(Produto).all()
+        if not produtos:
+            print("O estoque está vazio.")
+            return
+
+        for p in produtos:
+            print(f"Nome: {p.nome}")
+            print(f"Código: {p.codigo}")
+            print(f"Quantidade: {p.qtd}")
+            print(f"Lote: {p.lote}")
+            print(f"Data de entrada: {p.data_entrada}")
+            print("-" * 20)
+
+
 class Fornecedor(Base):
     __tablename__ = 'fornecedores'
 
@@ -132,7 +159,7 @@ class Produto(Item):
 
     @staticmethod
     def adicionar(nome, codigo, qtd, lote, fornecedor_id, marca_id):
-        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote, 
+        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote,
                         fornecedor_id=fornecedor_id, marca_id=marca_id)
         session.add(produto)
         session.commit()
@@ -147,21 +174,6 @@ class Produto(Item):
         session.delete(produto)
         session.commit()
         print(f"Produto {produto.nome} removido com sucesso!")
-
-    @classmethod
-    def listar_estoque(cls):
-        produtos = session.query(cls).all()
-        if not produtos:
-            print("O estoque está vazio.")
-            return
-
-        for p in produtos:
-            print(f"Nome: {p.nome}")
-            print(f"Código: {p.codigo}")
-            print(f"Quantidade: {p.qtd}")
-            print(f"Lote: {p.lote}")
-            print(f"Data de entrada: {p.data_entrada}")
-            print("-" * 20)
 
     @staticmethod
     def buscar_por_codigo(codigo):
