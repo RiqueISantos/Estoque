@@ -135,11 +135,11 @@ class Item(Base):
     data_cadastro = Column(Date, default=datetime.date.today)
 
     @abstractmethod
-    def adicionar(self, session):
+    def adicionar(self):
         pass
 
     @abstractmethod
-    def remover(self, session):
+    def remover(self):
         pass
 
 
@@ -157,23 +157,26 @@ class Produto(Item):
     fornecedor = relationship('Fornecedor', back_populates='produtos')
     marca = relationship('Marca', back_populates='produtos')
 
-    @staticmethod
-    def adicionar(nome, codigo, qtd, lote, fornecedor_id, marca_id):
-        produto = Produto(nome=nome, codigo=codigo, qtd=qtd, lote=lote,
-                        fornecedor_id=fornecedor_id, marca_id=marca_id)
-        session.add(produto)
+    def __init__(self, nome, codigo, qtd, lote, fornecedor_id, marca_id,id = None):
+        self.id = id
+        self.nome = nome
+        self.codigo = codigo
+        self.qtd = qtd
+        self.lote = lote
+        self.fornecedor_id = fornecedor_id
+        self.marca_id = marca_id
+
+    def adicionar(self):
+        session.add(self)
         session.commit()
-        print(f"Produto {nome} adicionado com sucesso!")
+        print(f"Produto {self.nome} adicionado com sucesso!")
         
-    @staticmethod
-    def remover(id):
-        produto = session.query(Produto).filter_by(id=id).first()
-        if not produto:
-            print('Produto não foi cadastrado no sistema')
-            return
-        session.delete(produto)
+
+    def remover(self):
+        print(f"Produto {self.nome} removido com sucesso!")
+        session.delete(self)
         session.commit()
-        print(f"Produto {produto.nome} removido com sucesso!")
+
 
     @staticmethod
     def buscar_por_codigo(codigo):

@@ -1,7 +1,9 @@
-import utls.estoque as e
+import utls.UTILS.estoque as e
+from utls.UTILS.estoque import Produto
 import os
 def limpa_tela():
     print(os.system('cls'))
+    return
 
 
 def interface():
@@ -64,14 +66,28 @@ def interface():
                 lote = input('codigo do lote: ')
                 fornecedor = int(input('Digite o codigo do fornecedor: '))
                 marca = int(input('Digite o codigo da marca do produto: '))
-                e.Produto.adicionar(nome_produto,codigo_produto,qtd,lote,fornecedor,marca)
+                novo_produto = Produto(
+                    nome=nome_produto,
+                    codigo=codigo_produto,
+                    qtd=qtd,
+                    lote=lote,
+                    fornecedor_id=fornecedor,
+                    marca_id=marca
+                )
+
+                novo_produto.adicionar()
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
             elif produto == 2:
                 limpa_tela()
-                id = int(input('digite o id do produto para remover: '))
-                e.Produto.remover(id)
+                id_removido = int(input('digite o id do produto para remover: '))
+                produto_remover = e.session.query(e.Produto).filter_by(id = id_removido).first()
+                if produto_remover:
+                    produto_remover.remover()
+                else:
+                    print(f'produto com o id {id_removido} não encontrado')
+
                 input('pressione Enter para continuar...')
                 limpa_tela()
 

@@ -1,3 +1,3 @@
-import utls.interface as p
+import utls as p
 
-p.interface()
+p.UTILS.interface.interface()
