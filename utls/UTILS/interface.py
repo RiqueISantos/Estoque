@@ -8,19 +8,18 @@ def limpa_tela():
 
 def interface():
     while True:
+        limpa_tela()
         numero = int(input('1 - Fornecedor \n2 - Categoria \n3 - Marca \n4 - Produto \n5 - Estoque\n'))
         if numero == 1:
             limpa_tela()
             fornecedor = int(input('1- adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n'))
             if fornecedor == 1:
                 limpa_tela()
-                nome = input('Insira o nome do fornecedor: ')
-                contato = input('insira o numero para contato com o fornecedor: ')
-                e.Fornecedor.adicionar(nome,contato)
+                e.Fornecedor.adicionar()
+                input('pressione Enter para continuar...')
             elif fornecedor == 2:
                 limpa_tela()
-                numero_fornecedor = int(input('Digite o número do id do fornecedor que você queira consultar: '))
-                e.Fornecedor.produto_fornecedor(numero_fornecedor)
+                e.Fornecedor.produto_fornecedor()
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
@@ -28,14 +27,14 @@ def interface():
             limpa_tela()
             categoria = int(input('1- Adicionar uma categoria \n2- Marcas por categoria\n'))
             if categoria == 1:
-                nome_categoria = input('Nome da categoria: ')
-                e.Categoria.adicionar(nome_categoria)
+                limpa_tela()
+                e.Categoria.adicionar()
                 input('Pressione Enter para continuar')
                 limpa_tela()
 
             elif categoria == 2:
-                nome_cat = input('Insira o nome da categoria que você deseja: ')
-                e.Categoria.marca_categoria(nome_cat)
+                limpa_tela()
+                e.Categoria.marca_categoria()
                 input('Pressione Enter para continuar')
                 limpa_tela()
 
@@ -43,15 +42,14 @@ def interface():
             limpa_tela()
             marca = int(input('1- Adicionar uma marca \n2- Produtos por marca\n'))
             if marca == 1:
-                nome_marca = input('Insira o nome da marca: ')
-                numero_categoria = int(input(f'Insira o numero da categoria que deseja incluir a {nome_marca}: '))
-                e.Marca.adicionar(nome_marca,numero_categoria)
+                limpa_tela()
+                e.Marca.adicionar()
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
             if marca == 2:
-                nome_marca2 = input('Digite o nome da marca que deseja ver os produtos: ')
-                e.Marca.produto_marca(nome_marca2)
+                limpa_tela()
+                e.Marca.produto_marca()
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
@@ -61,14 +59,12 @@ def interface():
             if produto == 1:
                 limpa_tela()
                 nome_produto = input('nome do produto: ')
-                codigo_produto = input('codigo do produto: ')
                 qtd = int(input('quantidade: '))
                 lote = input('codigo do lote: ')
                 fornecedor = int(input('Digite o codigo do fornecedor: '))
                 marca = int(input('Digite o codigo da marca do produto: '))
                 novo_produto = Produto(
                     nome=nome_produto,
-                    codigo=codigo_produto,
                     qtd=qtd,
                     lote=lote,
                     fornecedor_id=fornecedor,
@@ -81,20 +77,15 @@ def interface():
 
             elif produto == 2:
                 limpa_tela()
-                id_removido = int(input('digite o id do produto para remover: '))
-                produto_remover = e.session.query(e.Produto).filter_by(id = id_removido).first()
-                if produto_remover:
-                    produto_remover.remover()
-                else:
-                    print(f'produto com o id {id_removido} não encontrado')
+                e.Produto.remover()
+
 
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
             elif produto == 3:
                 limpa_tela()
-                codigo_p = input('insira o codigo do produto: ')
-                e.Produto.buscar_por_codigo(codigo_p)
+                e.Produto.buscar_por_codigo()
                 input('pressione Enter para continuar...')
                 limpa_tela()
 

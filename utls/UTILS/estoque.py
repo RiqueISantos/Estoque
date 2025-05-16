@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from abc import ABCMeta, abstractmethod
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
+
+
 # Definir a metaclasse combinada para suporte a classes abstratas
 class DeclarativeABCMeta(DeclarativeMeta, ABCMeta):
     pass
@@ -16,6 +18,13 @@ Base = declarative_base(metaclass=DeclarativeABCMeta)
 db = create_engine('sqlite:///estoque.db')
 Session = sessionmaker(bind=db)
 session = Session()
+
+def commit_session():
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        print(f"Erro ao salvar no banco: {e}")
 
 # ------------------------------------------
 class Estoque:
@@ -32,16 +41,19 @@ class Estoque:
     @classmethod
     def listar_estoque(cls):
         produtos = session.query(Produto).all()
+
         if not produtos:
             print("O estoque está vazio.")
             return
 
         for p in produtos:
+            print(f'Id: {p.id}')
             print(f"Nome: {p.nome}")
-            print(f"Código: {p.codigo}")
             print(f"Quantidade: {p.qtd}")
             print(f"Lote: {p.lote}")
-            print(f"Data de entrada: {p.data_entrada}")
+            print(f"Data de entrada: {p.data_cadastro}")
+            print(f"Marca: {p.marca.nome}")
+            print(f"Fornecedor: {p.fornecedor.nome}")
             print("-" * 20)
 
 
@@ -54,21 +66,35 @@ class Fornecedor(Base):
     produtos = relationship('Produto', back_populates='fornecedor')
 
     @staticmethod
-    def adicionar(nome, contato):
-        fornecedor = Fornecedor(nome=nome, contato=contato)
-        session.add(fornecedor)
-        session.commit()
-        print(f'O fornecedor {nome} foi adicionado')
+    def adicionar():
+        nome = input('Insira o nome do fornecedor: ')
+        contato = input('insira o numero para contato com o fornecedor: ')
+        fornecedores = session.query(Fornecedor).filter_by(nome=nome).first()
+        if not fornecedores:
+            fornecedor = Fornecedor(nome=nome, contato=contato)
+            session.add(fornecedor)
+            session.commit()
+            print(f'O fornecedor {nome} foi adicionado')
+            return
+        print(f'fornecedor {nome} já cadastrado no sistema')
 
     @staticmethod
-    def produto_fornecedor(id_fornecedor):
-        fornecedor = session.query(Fornecedor).filter_by(id=id_fornecedor).first()
+    def produto_fornecedor():
+        id_for = int(input('Digite o número do id do fornecedor que você queira consultar: '))
+        fornecedor = session.query(Fornecedor).filter_by(id=id_for).first()
         if not fornecedor:
-            print(f'Fornecedor com id {id_fornecedor} não cadastrado no sistema')
+            print(f'Fornecedor com id {id_for} não cadastrado no sistema')
             return
         print(f'Produtos do {fornecedor.nome}:')
-        for produto in fornecedor.produtos:
-            print(f'{produto.nome} - lote: {produto.lote}')
+        for p in fornecedor.produtos:
+            print(f'Id: {p.id}')
+            print(f"Nome: {p.nome}")
+            print(f"Quantidade: {p.qtd}")
+            print(f"Lote: {p.lote}")
+            print(f"Data de entrada: {p.data_cadastro}")
+            print(f"Marca: {p.marca.nome}")
+            print(f"Fornecedor: {p.fornecedor.nome}")
+            print("-" * 20)
 
 
 # ------------------------------------------
@@ -81,21 +107,27 @@ class Categoria(Base):
     marcas = relationship('Marca', backref='categoria')
 
     @staticmethod
-    def adicionar(nome):
-        categoria = Categoria(nome=nome)
-        session.add(categoria)
-        session.commit()
-        print(f'Categoria {nome} foi adicionada')
+    def adicionar():
+        nome = input('Nome da categoria: ')
+        categorias = session.query(Categoria).filter_by(nome=nome).first()
+        if not categorias:
+            categoria = Categoria(nome=nome)
+            session.add(categoria)
+            commit_session()
+            print(f'Categoria {nome} foi adicionada')
+            return
+        print(f'categoria {nome} já foi adicionada')
 
     @staticmethod
-    def marca_categoria(nome_categoria):
-        categoria = session.query(Categoria).filter_by(nome=nome_categoria).first()
+    def marca_categoria():
+        nome_cat = input('Nome da categoria: ')
+        categoria = session.query(Categoria).filter_by(nome=nome_cat).first()
         if not categoria:
-            print(f'Nenhuma categoria com o nome {nome_categoria}')
+            print(f'Nenhuma categoria com o nome {nome_cat}')
             return
-        print(f'Todas as marcas com a categoria {nome_categoria}:')
+        print(f'Marcas de {nome_cat}:')
         for marca in categoria.marcas:
-            print(marca.nome)
+            print(f'{marca.id} - {marca.nome}')
 
 
 # ------------------------------------------
@@ -109,21 +141,39 @@ class Marca(Base):
     produtos = relationship('Produto', back_populates='marca')
 
     @staticmethod
-    def adicionar(nome, id_categoria):
-        marca = Marca(nome=nome, id_categoria=id_categoria)
-        session.add(marca)
-        session.commit()
-        print(f'A marca {nome} foi adicionada')
+    def adicionar():
+        nome = input('Insira o nome da marca: ')
+        id_categoria = int(input(f'Insira o numero da categoria que deseja incluir a marca {nome}: '))
+        marcas = session.query(Marca).filter_by(nome=nome).first()
+        if not marcas:
+            id_categorias = session.query(Categoria).filter_by(id=id_categoria).first()
+            if id_categorias:
+                marca = Marca(nome=nome, id_categoria=id_categoria)
+                session.add(marca)
+                session.commit()
+                print(f'A marca {nome} foi adicionada')
+                return
+            else:
+                print(f'A categoria não existe')
+                return
+        print(f'marca {nome} já cadastrada')
 
     @staticmethod
-    def produto_marca(nome_marca):
+    def produto_marca():
+        nome_marca = input('Digite o nome da marca que deseja ver os produtos: ')
         marca = session.query(Marca).filter_by(nome=nome_marca).first()
         if not marca:
             print(f'A marca {nome_marca} não está registrada no sistema')
             return
         print(f'Produtos da marca {nome_marca}:')
-        for produto in marca.produtos:
-            print(f'{produto.nome} - {produto.codigo}')
+        for p in marca.produtos:
+            print(f'Id: {p.id}')
+            print(f"Nome: {p.nome}")
+            print(f"Quantidade: {p.qtd}")
+            print(f"Lote: {p.lote}")
+            print(f"Data de entrada: {p.data_cadastro}")
+            print(f"Marca: {p.marca.nome}")
+            print("-" * 20)
 
 
 # ------------------------------------------
@@ -147,48 +197,67 @@ class Item(Base):
 class Produto(Item):
     __tablename__ = 'produtos'
 
-    codigo = Column(String, unique=True)
     qtd = Column(Integer)
     lote = Column(String)
-    data_entrada = Column(Date, default=datetime.date.today)
     fornecedor_id = Column(Integer, ForeignKey('fornecedores.id'))
     marca_id = Column(Integer, ForeignKey('marca.id'))
 
     fornecedor = relationship('Fornecedor', back_populates='produtos')
     marca = relationship('Marca', back_populates='produtos')
 
-    def __init__(self, nome, codigo, qtd, lote, fornecedor_id, marca_id,id = None):
-        self.id = id
+    def __init__(self, nome, qtd, lote, fornecedor_id, marca_id):
         self.nome = nome
-        self.codigo = codigo
         self.qtd = qtd
         self.lote = lote
         self.fornecedor_id = fornecedor_id
         self.marca_id = marca_id
 
     def adicionar(self):
-        session.add(self)
-        session.commit()
-        print(f"Produto {self.nome} adicionado com sucesso!")
-        
+        produtos = session.query(Produto).filter_by(nome=self.nome,marca_id = self.marca_id,fornecedor_id = self.fornecedor_id).first()
+        if not produtos:
+            fornecedores = session.query(Fornecedor).filter_by(id = self.fornecedor_id).first()
+            if fornecedores:
+                marcas = session.query(Marca).filter_by(id = self.marca_id).first()
+                if marcas:
+                    session.add(self)
+                    session.commit()
+                    print(f"Produto {self.nome} adicionado com sucesso!")
+                else:
+                    print(f'marca não foi cadastrada')
+            else:
+                print(f'fornecedor não foi cadastrado')
+        else:
+            print(f'Produto já foi adicionado no sistema')
 
-    def remover(self):
-        print(f"Produto {self.nome} removido com sucesso!")
-        session.delete(self)
-        session.commit()
+    @staticmethod
+    def remover():
+        id_removido = int(input('digite o id do produto para remover: '))
+        produto_remover = session.query(Produto).filter_by(id=id_removido).first()
+        if produto_remover:
+            nomep = produto_remover.nome
+            marcap = produto_remover.marca.nome
+            session.delete(produto_remover)
+            session.commit()
+            print(f"Produto {nomep} - {marcap} removido com sucesso!")
+            return
+        print(f'Produto não encontrado')
 
 
     @staticmethod
-    def buscar_por_codigo(codigo):
-        produto = session.query(Produto).filter_by(codigo=codigo).first()
-        if produto:
-            print(f"Nome: {produto.nome}")
-            print(f"Código: {produto.codigo}")
-            print(f"Quantidade: {produto.qtd}")
-            print(f"Lote: {produto.lote}")
-            print(f"Data de entrada: {produto.data_entrada}")
+    def buscar_por_codigo():
+        i = int(input('Insira o id do produto: '))
+        p = session.query(Produto).filter_by(id=i).first()
+        if p:
+            print(f'Id: {p.id}')
+            print(f"Nome: {p.nome}")
+            print(f"Quantidade: {p.qtd}")
+            print(f"Lote: {p.lote}")
+            print(f"Data de entrada: {p.data_cadastro}")
+            print(f"Marca: {p.marca.nome}")
+            print(f"Fornecedor: {p.fornecedor.nome}")
+            print("-" * 20)
         else:
-            print(f"Nenhum produto com o código {codigo} foi encontrado.")
+            print(f"Nenhum produto com o id {i} foi encontrado.")
 
 
 # ------------------------------------------
