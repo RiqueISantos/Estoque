@@ -62,21 +62,24 @@ class Fornecedor(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String, unique=True)
-    contato = Column(String)
+    _contato = Column(String)
     produtos = relationship('Produto', back_populates='fornecedor')
 
-    @staticmethod
-    def adicionar():
-        nome = input('Insira o nome do fornecedor: ')
-        contato = input('insira o numero para contato com o fornecedor: ')
-        fornecedores = session.query(Fornecedor).filter_by(nome=nome).first()
+    def __init__(self, nome,contato):
+        self.nome = nome
+        self._contato = contato
+
+
+
+    def adicionar(self):
+        fornecedores = session.query(Fornecedor).filter_by(nome=self.nome).first()
         if not fornecedores:
-            fornecedor = Fornecedor(nome=nome, contato=contato)
+            fornecedor = Fornecedor(nome=self.nome, contato=self._contato)
             session.add(fornecedor)
             session.commit()
-            print(f'O fornecedor {nome} foi adicionado')
+            print(f'O fornecedor {self.nome} foi adicionado')
             return
-        print(f'fornecedor {nome} já cadastrado no sistema')
+        print(f'fornecedor {self.nome} já cadastrado no sistema')
 
     @staticmethod
     def produto_fornecedor():
@@ -95,6 +98,27 @@ class Fornecedor(Base):
             print(f"Marca: {p.marca.nome}")
             print(f"Fornecedor: {p.fornecedor.nome}")
             print("-" * 20)
+
+    @property
+    def contato(self):
+        return self._contato
+
+    @contato.setter
+    def contato(self, novo):
+        self._contato = novo
+
+    @staticmethod
+    def atualiza_contato():
+        id_fornecedor = int(input('Digite i ID do fornecedor que deseja atualizar o cadastro: '))
+        fornecedor = session.query(Fornecedor).filter_by(id = id_fornecedor).first()
+        if fornecedor:
+            contato_novo = input('Digite o novo contato do forncedor: ')
+            fornecedor.contato = contato_novo
+            session.commit()
+        else:
+            print('Fornecedor não foi encontrado')
+
+
 
 
 # ------------------------------------------

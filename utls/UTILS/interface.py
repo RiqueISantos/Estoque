@@ -1,5 +1,5 @@
 import utls.UTILS.estoque as e
-from utls.UTILS.estoque import Produto
+from utls.UTILS.estoque import Produto, Fornecedor
 import os
 def limpa_tela():
     print(os.system('cls'))
@@ -12,10 +12,13 @@ def interface():
         numero = int(input('1 - Fornecedor \n2 - Categoria \n3 - Marca \n4 - Produto \n5 - Estoque\n'))
         if numero == 1:
             limpa_tela()
-            fornecedor = int(input('1- adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n'))
+            fornecedor = int(input('1- adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n3- Mudar contato fornecedor\n'))
             if fornecedor == 1:
+                nome = input('Insira o nome do fornecedor: ')
+                contato = input('insira o numero para contato com o fornecedor: ')
+                fornecedor = Fornecedor(nome,contato)
                 limpa_tela()
-                e.Fornecedor.adicionar()
+                fornecedor.adicionar()
                 input('pressione Enter para continuar...')
             elif fornecedor == 2:
                 limpa_tela()
@@ -23,6 +26,11 @@ def interface():
                 input('pressione Enter para continuar...')
                 limpa_tela()
 
+            elif fornecedor == 3:
+                limpa_tela()
+                e.Fornecedor.atualiza_contato()
+                input('pressione Enter para continuar...')
+                limpa_tela()
         elif numero == 2:
             limpa_tela()
             categoria = int(input('1- Adicionar uma categoria \n2- Marcas por categoria\n'))
