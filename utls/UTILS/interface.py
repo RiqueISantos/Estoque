@@ -1,5 +1,5 @@
 import utls.UTILS.estoque as e
-from utls.UTILS.estoque import Produto, Fornecedor
+from utls.UTILS.estoque import Produto, Fornecedor, ler_texto, ler_inteiro
 import os
 def limpa_tela():
     print(os.system('cls'))
@@ -14,8 +14,8 @@ def interface():
             limpa_tela()
             fornecedor = int(input('1- adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n3- Mudar contato fornecedor\n'))
             if fornecedor == 1:
-                nome = input('Insira o nome do fornecedor: ')
-                contato = input('insira o numero para contato com o fornecedor: ')
+                nome = ler_texto('Insira o nome do fornecedor: ', 1, 50)
+                contato = ler_inteiro('insira o numero para contato com o fornecedor: ', 11,11)
                 fornecedor = Fornecedor(nome,contato)
                 limpa_tela()
                 fornecedor.adicionar()

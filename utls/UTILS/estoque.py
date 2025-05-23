@@ -25,6 +25,44 @@ def commit_session():
     except Exception as e:
         session.rollback()
         print(f"Erro ao salvar no banco: {e}")
+        return
+
+def ler_texto(mensagem, minimo, maximo):
+    while True:
+        entrada = input(mensagem).strip()
+        if not entrada:
+            print("Entrada vazia. Digite um valor válido.")
+        elif len(entrada) < minimo:
+            print(f"O texto deve ter pelo menos {minimo} caracteres.")
+        elif len(entrada) > maximo:
+            print(f"O texto deve ter no máximo {maximo} caracteres.")
+        elif not entrada.isalpha():
+            print('Apenas letras')
+        else:
+          return entrada
+
+def ler_inteiro(mensagem,maximo,minimo):
+    while True:
+        entrada = input(mensagem).strip()
+        try:
+            if len(entrada) < minimo or  len(entrada) > maximo:
+                print(f'O valor deve ter no minimo {minimo} e no maximo {maximo}!')
+            else:
+                return int(entrada)
+        except ValueError:
+            print("Entrada inválida. Digite um número inteiro.")
+
+def texto_num(mensagem, minimo, maximo):
+    while True:
+        entrada = input(mensagem).strip()
+        if not entrada:
+            print("Entrada vazia. Digite um valor válido.")
+        elif len(entrada) < minimo:
+            print(f"O texto deve ter pelo menos {minimo} caracteres.")
+        elif len(entrada) > maximo:
+            print(f"O texto deve ter no máximo {maximo} caracteres.")
+        else:
+          return entrada
 
 # ------------------------------------------
 class Estoque:
@@ -62,7 +100,7 @@ class Fornecedor(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String, unique=True)
-    _contato = Column(String)
+    _contato = Column(Integer)
     produtos = relationship('Produto', back_populates='fornecedor')
 
     def __init__(self, nome,contato):
@@ -76,7 +114,7 @@ class Fornecedor(Base):
         if not fornecedores:
             fornecedor = Fornecedor(nome=self.nome, contato=self._contato)
             session.add(fornecedor)
-            session.commit()
+            commit_session()
             print(f'O fornecedor {self.nome} foi adicionado')
             return
         print(f'fornecedor {self.nome} já cadastrado no sistema')
@@ -205,7 +243,7 @@ class Item(Base):
     __abstract__ = True  # Não será mapeada
 
     id = Column(Integer, primary_key=True)
-    nome = Column(String(100), nullable=False)
+    nome = Column(String, nullable=False)
     data_cadastro = Column(Date, default=datetime.date.today)
 
     @abstractmethod
