@@ -63,9 +63,26 @@ def texto_num(mensagem, minimo, maximo):
             print(f"O texto deve ter no máximo {maximo} caracteres.")
         else:
           return entrada
+    
+def lista_marca(nome):
+    marca = session.query(Marca).all()
+    for marca in categoria.marcas:
+        print(f'{marca.id} - {marca.nome}')
+
 
 # ------------------------------------------
 class Estoque:
+
+    @classmethod
+    def listar_categorias(cls):
+        categorias = session.query(Categoria).all()
+        if not categorias:
+            print('Não existe categorias cadastradas')
+            return
+        for c in categorias:
+            print(f'{c.id} - {c.nome}')
+
+    
 
     @classmethod
     def mostrar_fornecedores(cls):
@@ -93,6 +110,7 @@ class Estoque:
             print(f"Marca: {p.marca.nome}")
             print(f"Fornecedor: {p.fornecedor.nome}")
             print("-" * 20)
+
 
 
 class Fornecedor(Base):
@@ -147,7 +165,7 @@ class Fornecedor(Base):
 
     @staticmethod
     def atualiza_contato():
-        id_fornecedor = int(input('Digite i ID do fornecedor que deseja atualizar o cadastro: '))
+        id_fornecedor = int(input('Digite o ID do fornecedor que deseja atualizar o cadastro: '))
         fornecedor = session.query(Fornecedor).filter_by(id = id_fornecedor).first()
         if fornecedor:
             contato_novo = input('Digite o novo contato do forncedor: ')
@@ -190,6 +208,7 @@ class Categoria(Base):
         print(f'Marcas de {nome_cat}:')
         for marca in categoria.marcas:
             print(f'{marca.id} - {marca.nome}')
+
 
 
 # ------------------------------------------
@@ -236,6 +255,7 @@ class Marca(Base):
             print(f"Data de entrada: {p.data_cadastro}")
             print(f"Marca: {p.marca.nome}")
             print("-" * 20)
+
 
 
 # ------------------------------------------

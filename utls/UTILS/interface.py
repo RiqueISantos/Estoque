@@ -2,13 +2,14 @@ import utls.UTILS.estoque as e
 from utls.UTILS.estoque import Produto, Fornecedor, ler_texto, ler_inteiro
 import os
 def limpa_tela():
-    print(os.system('cls'))
+    os.system('cls')
     return
 
 
 def interface():
     while True:
         limpa_tela()
+        print('Digite o menu que deseja acessar:')
         numero = int(input('1 - Fornecedor \n2 - Categoria \n3 - Marca \n4 - Produto \n5 - Estoque\n'))
         if numero == 1:
             limpa_tela()
@@ -48,7 +49,7 @@ def interface():
 
         elif numero == 3:
             limpa_tela()
-            marca = int(input('1- Adicionar uma marca \n2- Produtos por marca\n'))
+            marca = int(input('1- Adicionar uma marca \n2- Produtos por marca\n3- Listar marcas\n'))
             if marca == 1:
                 limpa_tela()
                 e.Marca.adicionar()
@@ -60,6 +61,8 @@ def interface():
                 e.Marca.produto_marca()
                 input('pressione Enter para continuar...')
                 limpa_tela()
+            
+            
 
         elif numero == 4:
             limpa_tela()
@@ -69,7 +72,14 @@ def interface():
                 nome_produto = input('nome do produto: ')
                 qtd = int(input('quantidade: '))
                 lote = input('codigo do lote: ')
-                fornecedor = int(input('Digite o codigo do fornecedor: '))
+                limpa_tela()
+                e.Estoque.mostrar_fornecedores()
+                fornecedor = int(input('Digite o codigo do fornecedor que queira adicionar: '))
+                limpa_tela()
+
+                e.Estoque.listar_categorias()
+                
+                e.Categoria.marca_categoria()
                 marca = int(input('Digite o codigo da marca do produto: '))
                 novo_produto = Produto(
                     nome=nome_produto,
