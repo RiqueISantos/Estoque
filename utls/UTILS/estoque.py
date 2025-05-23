@@ -63,11 +63,6 @@ def texto_num(mensagem, minimo, maximo):
             print(f"O texto deve ter no máximo {maximo} caracteres.")
         else:
           return entrada
-    
-def lista_marca(nome):
-    marca = session.query(Marca).all()
-    for marca in categoria.marcas:
-        print(f'{marca.id} - {marca.nome}')
 
 
 # ------------------------------------------
