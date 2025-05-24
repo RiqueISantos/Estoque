@@ -37,18 +37,19 @@ def ler_texto(mensagem, minimo, maximo):
         elif len(entrada) > maximo:
             print(f"O texto deve ter no máximo {maximo} caracteres.")
         elif not entrada.isalpha():
-            print('Apenas letras')
+            print("Apenas letras.")
         else:
-          return entrada
+            return entrada
 
-def ler_inteiro(mensagem,maximo,minimo):
+def ler_inteiro(mensagem, minimo, maximo=None):
     while True:
         entrada = input(mensagem).strip()
         try:
-            if len(entrada) < minimo or  len(entrada) > maximo:
-                print(f'O valor deve ter no minimo {minimo} e no maximo {maximo}!')
+            valor = int(entrada)
+            if valor < minimo or (maximo is not None and valor > maximo):
+                print(f'O valor deve estar entre {minimo} e {maximo}.')
             else:
-                return int(entrada)
+                return valor
         except ValueError:
             print("Entrada inválida. Digite um número inteiro.")
 
@@ -113,8 +114,8 @@ class Fornecedor(Base):
     __tablename__ = 'fornecedores'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nome = Column(String, unique=True)
-    _contato = Column(Integer)
+    nome = Column(String, unique=True, nullable=False)
+    _contato = Column(Integer, nullable=False)
     produtos = relationship('Produto', back_populates='fornecedor')
 
     def __init__(self, nome,contato):
@@ -135,7 +136,7 @@ class Fornecedor(Base):
 
     @staticmethod
     def produto_fornecedor():
-        id_for = int(input('Digite o número do id do fornecedor que você queira consultar: '))
+        id_for = ler_inteiro('Digite o número do id do fornecedor que você queira consultar: ',1,100)
         fornecedor = session.query(Fornecedor).filter_by(id=id_for).first()
         if not fornecedor:
             print(f'Fornecedor com id {id_for} não cadastrado no sistema')
@@ -161,10 +162,10 @@ class Fornecedor(Base):
 
     @staticmethod
     def atualiza_contato():
-        id_fornecedor = int(input('Digite o ID do fornecedor que deseja atualizar o cadastro: '))
+        id_fornecedor = ler_inteiro('Digite o ID do fornecedor que deseja atualizar o cadastro: ',1,100)
         fornecedor = session.query(Fornecedor).filter_by(id = id_fornecedor).first()
         if fornecedor:
-            contato_novo = input('Digite o novo contato do forncedor: ')
+            contato_novo = ler_inteiro('Digite o novo contato do forncedor: ',11,11)
             fornecedor.contato = contato_novo
             print('Contato atualizado com sucesso!')
             session.commit()
@@ -179,13 +180,13 @@ class Categoria(Base):
     __tablename__ = 'categorias'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nome = Column(String)
+    nome = Column(String, nullable=False)
 
     marcas = relationship('Marca', backref='categoria')
 
     @staticmethod
     def adicionar():
-        nome = input('Nome da categoria: ').capitalize()
+        nome = ler_texto('Nome da categoria: ',2,50).capitalize()
         categorias = session.query(Categoria).filter_by(nome=nome).first()
         if not categorias:
             categoria = Categoria(nome=nome)
@@ -198,10 +199,10 @@ class Categoria(Base):
     @staticmethod
     def marca_categoria():
         Estoque.listar_categorias()
-        nome_cat = input('Digite o nome da categoria: ').capitalize()
+        nome_cat = ler_texto('Digite o nome da categoria: ',2,50).capitalize()
         categoria = session.query(Categoria).filter_by(nome=nome_cat).first()
         if not categoria:
-            print(f'Nenhuma categoria com o nome {nome_cat}')
+            print(f'Nenhuma categoria com o nome "{nome_cat}" encontrada!')
             return
         
         if categoria.marcas:
@@ -218,17 +219,17 @@ class Marca(Base):
     __tablename__ = 'marca'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    nome = Column(String)
-    id_categoria = Column(Integer, ForeignKey('categorias.id'))
+    nome = Column(String(50), nullable=False)
+    id_categoria = Column(Integer, ForeignKey('categorias.id'), nullable=False)
 
     produtos = relationship('Produto', back_populates='marca')
 
     @staticmethod
     def adicionar():
-        nome = input('Insira o nome da marca: ').capitalize()
+        nome = ler_texto('Insira o nome da marca: ',2,50).capitalize()
         print('\nCategorias disponíveis:')
         Estoque.listar_categorias()
-        id_categoria = int(input(f'\nInsira o numero da categoria que deseja incluir a marca {nome}: '))
+        id_categoria = ler_inteiro(f'\nInsira o numero da categoria que deseja incluir a marca {nome}: ',1,100)
         marcas = session.query(Marca).filter_by(nome=nome).first()
         if not marcas:
             id_categorias = session.query(Categoria).filter_by(id=id_categoria).first()
@@ -245,7 +246,7 @@ class Marca(Base):
 
     @staticmethod
     def produto_marca():
-            nome_marca = input('\nDigite o nome da marca que deseja ver os produtos: ').capitalize()
+            nome_marca = ler_texto('\nDigite o nome da marca que deseja ver os produtos: ',2,50).capitalize()
             marca = session.query(Marca).filter_by(nome=nome_marca).first()
             if not marca:
                 print(f'A marca {nome_marca} não está registrada no sistema.')
@@ -271,8 +272,8 @@ class Item(Base):
     __abstract__ = True  # Não será mapeada
 
     id = Column(Integer, primary_key=True)
-    nome = Column(String, nullable=False)
-    data_cadastro = Column(Date, default=datetime.date.today)
+    nome = Column(String(50), nullable=False)
+    data_cadastro = Column(Date, default=datetime.date.today, nullable=False)
 
     @abstractmethod
     def adicionar(self):
@@ -287,10 +288,10 @@ class Item(Base):
 class Produto(Item):
     __tablename__ = 'produtos'
 
-    qtd = Column(Integer)
-    lote = Column(String)
-    fornecedor_id = Column(Integer, ForeignKey('fornecedores.id'))
-    marca_id = Column(Integer, ForeignKey('marca.id'))
+    qtd = Column(Integer, nullable=False)
+    lote = Column(String, nullable=False)
+    fornecedor_id = Column(Integer, ForeignKey('fornecedores.id'), nullable=False)
+    marca_id = Column(Integer, ForeignKey('marca.id'), nullable=False)
 
     fornecedor = relationship('Fornecedor', back_populates='produtos')
     marca = relationship('Marca', back_populates='produtos')
@@ -321,7 +322,7 @@ class Produto(Item):
 
     @staticmethod
     def remover():
-        id_removido = int(input('Digite o id do produto para remover: '))
+        id_removido = ler_inteiro('Digite o id do produto para remover: ',1,100)
         produto_remover = session.query(Produto).filter_by(id=id_removido).first()
         if produto_remover:
             nomep = produto_remover.nome
@@ -335,7 +336,7 @@ class Produto(Item):
 
     @staticmethod
     def buscar_por_nome():
-        nome = (input('Insira o nome do produto: ')).capitalize()
+        nome = ler_texto('Insira o nome do produto: ',2,100).capitalize()
         p = session.query(Produto).filter_by(nome=nome).first()
         if p:
             print(f'Id: {p.id}')
