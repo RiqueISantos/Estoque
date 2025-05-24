@@ -140,7 +140,7 @@ class Fornecedor(Base):
         if not fornecedor:
             print(f'Fornecedor com id {id_for} não cadastrado no sistema')
             return
-        print(f'Produtos do {fornecedor.nome}:')
+        print(f'\nProdutos do {fornecedor.nome}:')
         for p in fornecedor.produtos:
             print(f'Id: {p.id}')
             print(f"Nome: {p.nome}")
@@ -197,6 +197,7 @@ class Categoria(Base):
 
     @staticmethod
     def marca_categoria():
+        Estoque.listar_categorias()
         nome_cat = input('Digite o nome da categoria: ').capitalize()
         categoria = session.query(Categoria).filter_by(nome=nome_cat).first()
         if not categoria:
@@ -204,7 +205,7 @@ class Categoria(Base):
             return
         
         if categoria.marcas:
-            print(f'Marcas de produtos disponíveis em {nome_cat}:')
+            print(f'\nMarcas de produtos disponíveis em {nome_cat}:')
             for marca in categoria.marcas:
                 print(f'{marca.id} - {marca.nome}')
         else:
@@ -224,7 +225,7 @@ class Marca(Base):
 
     @staticmethod
     def adicionar():
-        nome = input('Insira o nome da marca: ')
+        nome = input('Insira o nome da marca: ').capitalize()
         print('\nCategorias disponíveis:')
         Estoque.listar_categorias()
         id_categoria = int(input(f'\nInsira o numero da categoria que deseja incluir a marca {nome}: '))
@@ -244,24 +245,24 @@ class Marca(Base):
 
     @staticmethod
     def produto_marca():
-        nome_marca = input('Digite o nome da marca que deseja ver os produtos: ')
-        marca = session.query(Marca).filter_by(nome=nome_marca).first()
-        if not marca:
-            print(f'A marca {nome_marca} não está registrada no sistema.')
-            return
-        
-        if marca.produtos:
-            print(f'Produtos da marca {nome_marca}:')
-            for p in marca.produtos:
-                print(f'Id: {p.id}')
-                print(f"Nome: {p.nome}")
-                print(f"Quantidade: {p.qtd}")
-                print(f"Lote: {p.lote}")
-                print(f"Data de entrada: {p.data_cadastro}")
-                print(f"Marca: {p.marca.nome}")
-                print("-" * 20)
-        else:
-            print(f'Nenhum produto encontrado na marca {nome_marca}!')
+            nome_marca = input('\nDigite o nome da marca que deseja ver os produtos: ').capitalize()
+            marca = session.query(Marca).filter_by(nome=nome_marca).first()
+            if not marca:
+                print(f'A marca {nome_marca} não está registrada no sistema.')
+                return
+            
+            if marca.produtos:
+                print(f'\nProdutos da marca {nome_marca}:')
+                for p in marca.produtos:
+                    print(f'Id: {p.id}')
+                    print(f"Nome: {p.nome}")
+                    print(f"Quantidade: {p.qtd}")
+                    print(f"Lote: {p.lote}")
+                    print(f"Data de entrada: {p.data_cadastro}")
+                    print(f"Marca: {p.marca.nome}")
+                    print("-" * 20)
+            else:
+                print(f'Nenhum produto encontrado na marca {nome_marca}!')
 
 
 

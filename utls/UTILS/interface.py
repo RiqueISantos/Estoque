@@ -45,7 +45,6 @@ def interface():
 
             elif categoria == 2:
                 limpa_tela()
-                e.Estoque.listar_categorias()
                 e.Categoria.marca_categoria()
                 input('\nPressione Enter para continuar')
                 limpa_tela()
@@ -67,7 +66,8 @@ def interface():
 
             if marca == 3:
                 limpa_tela()
-                input('FUNÇÃO NÃO CADASTRADA')
+                e.Categoria.marca_categoria()
+                input('\nPressione Enter para continuar...')
             
             
 
