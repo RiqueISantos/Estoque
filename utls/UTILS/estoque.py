@@ -96,6 +96,7 @@ class Estoque:
             print("O estoque está vazio.")
             return
 
+        print('Produtos disponíveis:\n')
         for p in produtos:
             print(f'Id: {p.id}')
             print(f"Nome: {p.nome}")
@@ -128,7 +129,7 @@ class Fornecedor(Base):
             fornecedor = Fornecedor(nome=self.nome, contato=self._contato)
             session.add(fornecedor)
             commit_session()
-            print(f'O fornecedor {self.nome} foi adicionado')
+            print(f'O fornecedor {self.nome} foi adicionado!')
             return
         print(f'fornecedor {self.nome} já cadastrado no sistema')
 
@@ -165,6 +166,7 @@ class Fornecedor(Base):
         if fornecedor:
             contato_novo = input('Digite o novo contato do forncedor: ')
             fornecedor.contato = contato_novo
+            print('Contato atualizado com sucesso!')
             session.commit()
         else:
             print('Fornecedor não foi encontrado')
@@ -183,7 +185,7 @@ class Categoria(Base):
 
     @staticmethod
     def adicionar():
-        nome = input('Nome da categoria: ')
+        nome = input('Nome da categoria: ').capitalize()
         categorias = session.query(Categoria).filter_by(nome=nome).first()
         if not categorias:
             categoria = Categoria(nome=nome)
@@ -195,14 +197,18 @@ class Categoria(Base):
 
     @staticmethod
     def marca_categoria():
-        nome_cat = input('Nome da categoria: ')
+        nome_cat = input('Digite o nome da categoria: ').capitalize()
         categoria = session.query(Categoria).filter_by(nome=nome_cat).first()
         if not categoria:
             print(f'Nenhuma categoria com o nome {nome_cat}')
             return
-        print(f'Marcas de {nome_cat}:')
-        for marca in categoria.marcas:
-            print(f'{marca.id} - {marca.nome}')
+        
+        if categoria.marcas:
+            print(f'Marcas de produtos disponíveis em {nome_cat}:')
+            for marca in categoria.marcas:
+                print(f'{marca.id} - {marca.nome}')
+        else:
+            print(f'Nenhuma marca cadastrada na categoria {nome_cat}!')
 
 
 
@@ -219,7 +225,9 @@ class Marca(Base):
     @staticmethod
     def adicionar():
         nome = input('Insira o nome da marca: ')
-        id_categoria = int(input(f'Insira o numero da categoria que deseja incluir a marca {nome}: '))
+        print('\nCategorias disponíveis:')
+        Estoque.listar_categorias()
+        id_categoria = int(input(f'\nInsira o numero da categoria que deseja incluir a marca {nome}: '))
         marcas = session.query(Marca).filter_by(nome=nome).first()
         if not marcas:
             id_categorias = session.query(Categoria).filter_by(id=id_categoria).first()
@@ -227,29 +235,33 @@ class Marca(Base):
                 marca = Marca(nome=nome, id_categoria=id_categoria)
                 session.add(marca)
                 session.commit()
-                print(f'A marca {nome} foi adicionada')
+                print(f'A marca {nome} foi adicionada!')
                 return
             else:
-                print(f'A categoria não existe')
+                print(f'A categoria não existe.')
                 return
-        print(f'marca {nome} já cadastrada')
+        print(f'Marca {nome} já foi cadastrada!')
 
     @staticmethod
     def produto_marca():
         nome_marca = input('Digite o nome da marca que deseja ver os produtos: ')
         marca = session.query(Marca).filter_by(nome=nome_marca).first()
         if not marca:
-            print(f'A marca {nome_marca} não está registrada no sistema')
+            print(f'A marca {nome_marca} não está registrada no sistema.')
             return
-        print(f'Produtos da marca {nome_marca}:')
-        for p in marca.produtos:
-            print(f'Id: {p.id}')
-            print(f"Nome: {p.nome}")
-            print(f"Quantidade: {p.qtd}")
-            print(f"Lote: {p.lote}")
-            print(f"Data de entrada: {p.data_cadastro}")
-            print(f"Marca: {p.marca.nome}")
-            print("-" * 20)
+        
+        if marca.produtos:
+            print(f'Produtos da marca {nome_marca}:')
+            for p in marca.produtos:
+                print(f'Id: {p.id}')
+                print(f"Nome: {p.nome}")
+                print(f"Quantidade: {p.qtd}")
+                print(f"Lote: {p.lote}")
+                print(f"Data de entrada: {p.data_cadastro}")
+                print(f"Marca: {p.marca.nome}")
+                print("-" * 20)
+        else:
+            print(f'Nenhum produto encontrado na marca {nome_marca}!')
 
 
 
@@ -300,15 +312,15 @@ class Produto(Item):
                     session.commit()
                     print(f"Produto {self.nome} adicionado com sucesso!")
                 else:
-                    print(f'marca não foi cadastrada')
+                    print(f'Marca não foi cadastrada')
             else:
-                print(f'fornecedor não foi cadastrado')
+                print(f'Fornecedor não foi cadastrado')
         else:
             print(f'Produto já foi adicionado no sistema')
 
     @staticmethod
     def remover():
-        id_removido = int(input('digite o id do produto para remover: '))
+        id_removido = int(input('Digite o id do produto para remover: '))
         produto_remover = session.query(Produto).filter_by(id=id_removido).first()
         if produto_remover:
             nomep = produto_remover.nome
@@ -321,9 +333,9 @@ class Produto(Item):
 
 
     @staticmethod
-    def buscar_por_codigo():
-        i = int(input('Insira o id do produto: '))
-        p = session.query(Produto).filter_by(id=i).first()
+    def buscar_por_nome():
+        nome = (input('Insira o nome do produto: ')).capitalize()
+        p = session.query(Produto).filter_by(nome=nome).first()
         if p:
             print(f'Id: {p.id}')
             print(f"Nome: {p.nome}")
@@ -334,7 +346,7 @@ class Produto(Item):
             print(f"Fornecedor: {p.fornecedor.nome}")
             print("-" * 20)
         else:
-            print(f"Nenhum produto com o id {i} foi encontrado.")
+            print(f"Nenhum produto com o nome {nome} foi encontrado.")
 
 
 # ------------------------------------------

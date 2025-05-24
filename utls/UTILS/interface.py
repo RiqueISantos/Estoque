@@ -13,24 +13,26 @@ def interface():
         numero = int(input('1 - Fornecedor \n2 - Categoria \n3 - Marca \n4 - Produto \n5 - Estoque\n'))
         if numero == 1:
             limpa_tela()
-            fornecedor = int(input('1- adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n3- Mudar contato fornecedor\n'))
+            fornecedor = int(input('1- Adicionar Fornecedor \n2- Listar todos os produtos do fornecedor pelo id\n3- Mudar contato fornecedor\n'))
             if fornecedor == 1:
-                nome = ler_texto('Insira o nome do fornecedor: ', 1, 50)
+                limpa_tela()
+                nome = ler_texto('Insira o nome do fornecedor: ', 1, 50).capitalize()
                 contato = ler_inteiro('insira o numero para contato com o fornecedor: ', 11,11)
                 fornecedor = Fornecedor(nome,contato)
-                limpa_tela()
                 fornecedor.adicionar()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
             elif fornecedor == 2:
                 limpa_tela()
+                e.Estoque.mostrar_fornecedores()
                 e.Fornecedor.produto_fornecedor()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
             elif fornecedor == 3:
                 limpa_tela()
+                e.Estoque.mostrar_fornecedores()
                 e.Fornecedor.atualiza_contato()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
         elif numero == 2:
             limpa_tela()
@@ -38,13 +40,14 @@ def interface():
             if categoria == 1:
                 limpa_tela()
                 e.Categoria.adicionar()
-                input('Pressione Enter para continuar')
+                input('\nPressione Enter para continuar')
                 limpa_tela()
 
             elif categoria == 2:
                 limpa_tela()
+                e.Estoque.listar_categorias()
                 e.Categoria.marca_categoria()
-                input('Pressione Enter para continuar')
+                input('\nPressione Enter para continuar')
                 limpa_tela()
 
         elif numero == 3:
@@ -53,28 +56,32 @@ def interface():
             if marca == 1:
                 limpa_tela()
                 e.Marca.adicionar()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
             if marca == 2:
                 limpa_tela()
                 e.Marca.produto_marca()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
+
+            if marca == 3:
+                limpa_tela()
+                input('FUNÇÃO NÃO CADASTRADA')
             
             
 
         elif numero == 4:
             limpa_tela()
-            produto = int(input('1- Adicionar produto \n2- Remover produto \n3- buscar especifica\n'))
+            produto = int(input('1- Adicionar produto \n2- Remover produto \n3- Busca específica\n'))
             if produto == 1:
                 limpa_tela()
-                nome_produto = input('nome do produto: ')
+                nome_produto = input('nome do produto: ').capitalize()
                 qtd = int(input('quantidade: '))
-                lote = input('codigo do lote: ')
+                lote = input('codigo do lote: ').upper()
                 limpa_tela()
                 e.Estoque.mostrar_fornecedores()
-                fornecedor = int(input('Digite o codigo do fornecedor que queira adicionar: '))
+                fornecedor = int(input('Digite o codigo do fornecedor deste produto: '))
                 limpa_tela()
 
                 e.Estoque.listar_categorias()
@@ -90,34 +97,35 @@ def interface():
                 )
 
                 novo_produto.adicionar()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
             elif produto == 2:
                 limpa_tela()
+                e.Estoque.listar_estoque()
                 e.Produto.remover()
 
 
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
             elif produto == 3:
                 limpa_tela()
-                e.Produto.buscar_por_codigo()
-                input('pressione Enter para continuar...')
+                e.Produto.buscar_por_nome()
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
         elif numero == 5:
             limpa_tela()
-            estoque = input('1- listar estoque\n2- listar fornecedores\n')
-            if estoque == '1':
+            estoque = int(input('1- Listar estoque\n2- Listar fornecedores\n'))
+            if estoque == 1:
                 limpa_tela()
                 e.Estoque.listar_estoque()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
-            elif estoque == '2':
+            elif estoque == 2:
                 limpa_tela()
                 e.Estoque.mostrar_fornecedores()
-                input('pressione Enter para continuar...')
+                input('\nPressione Enter para continuar...')
                 limpa_tela()
 
