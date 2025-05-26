@@ -44,14 +44,15 @@ def ler_texto(mensagem, minimo, maximo):
 def ler_inteiro(mensagem, minimo, maximo=None):
     while True:
         entrada = input(mensagem).strip()
-        try:
-            valor = int(entrada)
-            if valor < minimo or (maximo is not None and valor > maximo):
-                print(f'O valor deve estar entre {minimo} e {maximo}.')
-            else:
-                return valor
-        except ValueError:
-            print("Entrada inválida. Digite um número inteiro.")
+        if not entrada.isdigit():
+            print("Entrada inválida. Digite apenas números.")
+            continue
+
+        if len(entrada) < minimo or (maximo is not None and len(entrada) > maximo):
+            print(f'O número deve conter entre {minimo} e {maximo} dígitos.')
+            continue
+
+        return int(entrada)
 
 def texto_num(mensagem, minimo, maximo):
     while True:
@@ -87,7 +88,7 @@ class Estoque:
             print('Não há fornecedores cadastrados')
             return
         for f in fornecedores:
-            print(f'{f.id} - {f.nome} - {f.contato}')
+            print(f'id: {f.id} - cpf: {f.cpf} - nome: {f.nome} - contato: {f.contato}')
 
     @classmethod
     def listar_estoque(cls):
@@ -114,20 +115,36 @@ class Fornecedor(Base):
     __tablename__ = 'fornecedores'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    _cpf = Column(Integer,unique = True, nullable = False)
     nome = Column(String, unique=True, nullable=False)
     _contato = Column(Integer, nullable=False)
     produtos = relationship('Produto', back_populates='fornecedor')
 
-    def __init__(self, nome,contato):
+    def __init__(self, nome,contato,cpf):
         self.nome = nome
         self._contato = contato
+        self._cpf = cpf
 
+    @property
+    def cpf(self):
+        return self._cpf
 
+    @cpf.setter
+    def cpf(self, novo):
+        self._cpf = novo
+
+    @property
+    def contato(self):
+        return self._contato
+
+    @contato.setter
+    def contato(self, novo):
+        self._contato = novo
 
     def adicionar(self):
-        fornecedores = session.query(Fornecedor).filter_by(nome=self.nome).first()
+        fornecedores = session.query(Fornecedor).filter_by(cpf=self._cpf).first()
         if not fornecedores:
-            fornecedor = Fornecedor(nome=self.nome, contato=self._contato)
+            fornecedor = Fornecedor(cpf = self._cpf,nome=self.nome, contato=self._contato)
             session.add(fornecedor)
             commit_session()
             print(f'O fornecedor {self.nome} foi adicionado!')
@@ -152,13 +169,11 @@ class Fornecedor(Base):
             print(f"Fornecedor: {p.fornecedor.nome}")
             print("-" * 20)
 
-    @property
-    def contato(self):
-        return self._contato
 
-    @contato.setter
-    def contato(self, novo):
-        self._contato = novo
+
+
+
+
 
     @staticmethod
     def atualiza_contato():
@@ -199,18 +214,18 @@ class Categoria(Base):
     @staticmethod
     def marca_categoria():
         Estoque.listar_categorias()
-        nome_cat = ler_texto('Digite o nome da categoria: ',2,50).capitalize()
-        categoria = session.query(Categoria).filter_by(nome=nome_cat).first()
+        id_cat = ler_inteiro('Digite o id da categoria: ',1)
+        categoria = session.query(Categoria).filter_by(id = id_cat ).first()
         if not categoria:
-            print(f'Nenhuma categoria com o nome "{nome_cat}" encontrada!')
+            print(f'Nenhuma categoria com o id "{id_cat}" encontrada!')
             return
         
         if categoria.marcas:
-            print(f'\nMarcas de produtos disponíveis em {nome_cat}:')
+            print(f'\nMarcas disponíveis em {categoria.nome}:')
             for marca in categoria.marcas:
                 print(f'{marca.id} - {marca.nome}')
         else:
-            print(f'Nenhuma marca cadastrada na categoria {nome_cat}!')
+            print(f'Nenhuma marca cadastrada na categoria {categoria.nome}!')
 
 
 
@@ -336,17 +351,19 @@ class Produto(Item):
 
     @staticmethod
     def buscar_por_nome():
-        nome = ler_texto('Insira o nome do produto: ',2,100).capitalize()
-        p = session.query(Produto).filter_by(nome=nome).first()
-        if p:
-            print(f'Id: {p.id}')
-            print(f"Nome: {p.nome}")
-            print(f"Quantidade: {p.qtd}")
-            print(f"Lote: {p.lote}")
-            print(f"Data de entrada: {p.data_cadastro}")
-            print(f"Marca: {p.marca.nome}")
-            print(f"Fornecedor: {p.fornecedor.nome}")
-            print("-" * 20)
+        nome = ler_texto('Insira o nome do produto: ',2,50).capitalize()
+        pdt = session.query(Produto).filter_by(nome=nome).all()
+
+        if pdt:
+            for p in pdt:
+                print(f'Id: {p.id}')
+                print(f"Nome: {p.nome}")
+                print(f"Quantidade: {p.qtd}")
+                print(f"Lote: {p.lote}")
+                print(f"Data de entrada: {p.data_cadastro}")
+                print(f"Marca: {p.marca.nome}")
+                print(f"Fornecedor: {p.fornecedor.nome}")
+                print("-" * 20)
         else:
             print(f"Nenhum produto com o nome {nome} foi encontrado.")
 

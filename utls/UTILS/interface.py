@@ -17,8 +17,9 @@ def interface():
                 if fornecedor == 1:
                     limpa_tela()
                     nome = ler_texto('Insira o nome do fornecedor: ', 1, 50).capitalize()
+                    cpf = ler_inteiro(f'Insira o CPF de {nome}', 11,11)
                     contato = ler_inteiro('insira o numero para contato com o fornecedor: ', 11,11)
-                    fornecedor = Fornecedor(nome,contato)
+                    fornecedor = Fornecedor(nome,contato,cpf)
                     fornecedor.adicionar()
                     input('\nPressione Enter para continuar...')
                 elif fornecedor == 2:
@@ -83,8 +84,6 @@ def interface():
                     fornecedor = ler_inteiro('Digite o codigo do fornecedor deste produto: ',1,100)
                     limpa_tela()
 
-                    e.Estoque.listar_categorias()
-                        
                     e.Categoria.marca_categoria()
                     marca = ler_inteiro('Digite o codigo da marca do produto: ',1,100)
                     novo_produto = Produto(
