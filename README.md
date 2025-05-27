@@ -79,7 +79,7 @@ Estoque/
   <tr>
     <td align="center">
       <a href="https://github.com/NicolasLMs">
-        <img src="https://avatars.githubusercontent.com/u/156506020?v=4" width="100px;" alt="Nicolas"/><br />
+        <img src="https://avatars.githubusercontent.com/u/162654676?v=4" width="100px;" alt="Nicolas"/><br />
         <sub><b>NicolasLMs</b></sub>
       </a><br />
       💻 Desenvolvedor
@@ -93,7 +93,7 @@ Estoque/
     </td>
     <td align="center">
       <a href="https://github.com/yurigabriel09">
-        <img src="https://avatars.githubusercontent.com/u/109317125?v=4" width="100px;" alt="Yuri"/><br />
+        <img src="https://avatars.githubusercontent.com/u/164688235?v=4" width="100px;" alt="Yuri"/><br />
         <sub><b>yurigabriel09</b></sub>
       </a><br />
       💻 Contribuidor
