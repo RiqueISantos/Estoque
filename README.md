@@ -86,7 +86,7 @@ Estoque/
     </td>
     <td align="center">
       <a href="https://github.com/RiqueISantos">
-        <img src="https://avatars.githubusercontent.com/u/159038700?v=4" width="100px;" alt="Rique"/><br />
+        <img src="https://avatars.githubusercontent.com/u/90008281?v=4" width="100px;" alt="Rique"/><br />
         <sub><b>RiqueISantos</b></sub>
       </a><br />
       💻 Contribuidor
