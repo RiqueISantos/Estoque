@@ -89,21 +89,21 @@ Estoque/
         <img src="https://avatars.githubusercontent.com/u/90008281?v=4" width="100px;" alt="Rique"/><br />
         <sub><b>RiqueISantos</b></sub>
       </a><br />
-      💻 Contribuidor
+      💻 Desenvolvedor
     </td>
     <td align="center">
       <a href="https://github.com/yurigabriel09">
         <img src="https://avatars.githubusercontent.com/u/164688235?v=4" width="100px;" alt="Yuri"/><br />
         <sub><b>yurigabriel09</b></sub>
       </a><br />
-      💻 Contribuidor
+      💻 Desenvolvedor
     </td>
     <td align="center">
       <a href="https://github.com/ericmiguelbs">
         <img src="https://avatars.githubusercontent.com/u/25312556?v=4" width="100px;" alt="Eric"/><br />
         <sub><b>ericmiguelbs</b></sub>
       </a><br />
-      💻 Contribuidor
+      💻 Desenvolvedor
     </td>
   </tr>
 </table>
